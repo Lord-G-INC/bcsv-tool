@@ -64,6 +64,7 @@ namespace BCSV {
             default: { return 0; }
         }
     }
+    template <bool Swap = true>
     std::string ReadStringOff(unique_ifstream& data, Header& head, u32 row, Field& field) {
         std::streampos stringoff = head.entrydataoff + head.entrycount*head.entrysize;
         std::streampos posoff = head.entrydataoff + row * head.entrysize + field.dataoff;
@@ -71,21 +72,23 @@ namespace BCSV {
         data->seekg(posoff, std::ios::beg);
         u32 size{};
         data->read((char*)&size, sizeof(u32));
-        SwapVal(size);
+        if (Swap)
+            SwapVal(size);
         data->seekg(stringoff + std::streampos{size}, std::ios::beg);
         std::string result{};
         std::getline(*data, result);
         data->seekg(old);
         return result;
     }
-    template <typename T>
+    template <bool Swap = true, typename T>
     T ReadType(unique_ifstream& data, Header& head, u32 row, Field& field) {
         std::streampos posoff = head.entrydataoff + row * head.entrysize + field.dataoff;
         std::streampos old = data->tellg();
         data->seekg(posoff, std::ios::beg);
         T result{};
         data->read((char*)&result, sizeof(T));
-        SwapVal(result);
+        if (Swap)
+            SwapVal(result);
         return result;
     }
 }
