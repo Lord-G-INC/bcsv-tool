@@ -22,19 +22,7 @@ namespace {
         result r = read<result>(data);
         std::get<I>(tup) = r;
         return;
-    }
-
-    template <typename T>
-    void SwapVal(T& val) {
-        union U
-        {
-            T raw;
-            arr<T> buf;
-        } src, dst;
-        src.raw = val;
-        std::reverse_copy(src.buf.begin(), src.buf.end(), dst.buf.begin());
-        val = dst.raw;
-    }
+    }    
 
     template <bool Swap, size_t I, typename... Ts>
     typename std::enable_if<I == sizeof...(Ts)>::type unpack(unsigned char* data, std::tuple<Ts...>& tup) {

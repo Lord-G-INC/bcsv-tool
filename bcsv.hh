@@ -1,9 +1,18 @@
 #pragma once
 
 #include "unpack.hh"
-#include "types.h"
+#include <vector>
+#include <string>
 
 namespace BCSV {
+    static inline const u32 CalcHash(const char* val) {
+        u32 output{0};
+        while (*val != '\0') {
+            output = *val + output * 0x11;
+            val++;
+        }
+        return output;
+    }
     struct Header {
         u32 entrycount;
         u32 fieldcount;
@@ -11,7 +20,7 @@ namespace BCSV {
         u32 entrysize;
     };
     template <bool Swap = false>
-    Header ReadHeader(unsigned char* data) {
+    Header ReadHeader(unique_ifstream& data) {
         Header result{};
         std::tuple<u32, u32, u32, u32> tup = unpack<Swap, u32, u32, u32, u32>(data);
         unpacktuple(tup, &result.entrycount, &result.fieldcount, &result.entrydataoff, &result.entrysize);
@@ -34,14 +43,49 @@ namespace BCSV {
         u8 type;
     };
     template <bool Swap = false>
-    Field* ReadFields(unsigned char* data, Header& head) {
-        Field* result = new Field[head.fieldcount];
+    std::vector<Field> ReadFields(unique_ifstream& data, Header& head) {
+        std::vector<Field> result{head.fieldcount};
         for (int i = 0; i < head.fieldcount; i++) {
             Field* f = &result[i];
             std::tuple<u32, u32, u16, u8, u8> tup = unpack<Swap, u32, u32, u16, u8, u8>(data);
             unpacktuple(tup, &f->hash, &f->mask, &f->dataoff, &f->shift, &f->type);
-            data += sizeof(Field);
         }
+        return result;
+    }
+    static inline const size_t GetDTSize(Field& f) {
+        switch (f.type) {
+            case DataType::LONG:
+            case DataType::LONG_2:
+            case DataType::FLOAT:
+            case DataType::STRING_OFF: { return 4; }
+            case DataType::STRING: { return 32; }
+            case DataType::SHORT: { return 2; }
+            case DataType::CHAR: { return 1; }
+            default: { return 0; }
+        }
+    }
+    std::string ReadStringOff(unique_ifstream& data, Header& head, u32 row, Field& field) {
+        std::streampos stringoff = head.entrydataoff + head.entrycount*head.entrysize;
+        std::streampos posoff = head.entrydataoff + row * head.entrysize + field.dataoff;
+        std::streampos old = data->tellg();
+        data->seekg(posoff, std::ios::beg);
+        u32 size{};
+        data->read((char*)&size, sizeof(u32));
+        SwapVal(size);
+        data->seekg(stringoff + std::streampos{size}, std::ios::beg);
+        std::string result{};
+        std::getline(*data, result);
+        data->seekg(old);
+        return result;
+    }
+    template <typename T>
+    T ReadType(unique_ifstream& data, Header& head, u32 row, Field& field) {
+        std::streampos posoff = head.entrydataoff + row * head.entrysize + field.dataoff;
+        std::streampos old = data->tellg();
+        data->seekg(posoff, std::ios::beg);
+        T result{};
+        data->read((char*)&result, sizeof(T));
+        SwapVal(result);
         return result;
     }
 }

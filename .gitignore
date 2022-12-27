@@ -35,4 +35,4 @@
 # Extra
 *.bcsv
 *.csv
-old\*
+.vscode
