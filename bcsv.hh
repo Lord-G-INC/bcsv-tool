@@ -80,7 +80,7 @@ namespace BCSV {
         data->seekg(old);
         return result;
     }
-    template <bool Swap = true, typename T>
+    template <typename T, bool Swap = true>
     T ReadType(unique_ifstream& data, Header& head, u32 row, Field& field) {
         std::streampos posoff = head.entrydataoff + row * head.entrysize + field.dataoff;
         std::streampos old = data->tellg();
