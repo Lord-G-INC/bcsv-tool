@@ -84,4 +84,13 @@ namespace BCSV {
             SwapVal(result);
         return result;
     }
+    std::vector<std::string> GetFeildNames(std::vector<Field>& fields, std::map<u32, std::string>& dict) {
+        std::vector<std::string> result{};
+        for (auto& f : fields) {
+            if (dict.count(f.hash) != 0) {
+                result.push_back(dict[f.hash]);
+            }
+        }
+        return result;
+    }
 }
