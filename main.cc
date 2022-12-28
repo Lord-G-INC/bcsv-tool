@@ -2,6 +2,10 @@
 #include "bcsv.hh"
 
 int main() {
-    auto hashes = ReadHashes("lookup_supermariogalaxy.txt");
-    printf("%d", hashes.size());
+    auto sedt = OpenFile("StageEventDataTable.bcsv");
+    BCSV::Header head = BCSV::ReadHeader(sedt);
+    auto fields = BCSV::ReadFields(sedt, head);
+    auto dict = ReadHashes("lookup_supermariogalaxy.txt");
+    auto names = BCSV::GetFeildNames(fields, dict);
+    printf("%d", names.size());
 }

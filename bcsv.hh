@@ -57,6 +57,17 @@ namespace BCSV {
             default: { return 0; }
         }
     }
+    static inline const char* GetDTFmt(Field& f) {
+        switch (f.type) {
+            case DataType::LONG:
+            case DataType::SHORT:
+            case DataType::LONG_2: { return "%d"; }
+            case DataType::FLOAT: { return "%f"; }
+            case DataType::CHAR: { return "%c"; }
+            case DataType::STRING:
+            case DataType::STRING_OFF: { return "%s"; }
+        }
+    }
     template <bool Swap = true>
     std::string ReadStringOff(unique_ifstream& data, Header& head, u32 row, Field& field) {
         std::streampos stringoff = head.entrydataoff + head.entrycount*head.entrysize;
@@ -89,6 +100,8 @@ namespace BCSV {
         for (auto& f : fields) {
             if (dict.count(f.hash) != 0) {
                 result.push_back(dict[f.hash]);
+            } else {
+                result.push_back(string_format("0%x", f.hash));
             }
         }
         return result;
