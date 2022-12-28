@@ -1,18 +1,11 @@
 #pragma once
 
 #include "unpack.hh"
+#include "hash.hh"
 #include <vector>
 #include <string>
 
 namespace BCSV {
-    static inline const u32 CalcHash(const char* val) {
-        u32 output{0};
-        while (*val != '\0') {
-            output = *val + output * 0x11;
-            val++;
-        }
-        return output;
-    }
     struct Header {
         u32 entrycount;
         u32 fieldcount;

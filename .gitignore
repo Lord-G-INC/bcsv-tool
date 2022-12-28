@@ -36,3 +36,4 @@
 *.bcsv
 *.csv
 .vscode
+lookup_*.txt
