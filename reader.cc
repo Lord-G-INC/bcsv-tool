@@ -35,16 +35,22 @@ void Reader::WriteCSV(const char* path) {
                 case BCSV::DataType::LONG:
                 case BCSV::DataType::LONG_2: { 
                     s32 val = BCSV::ReadType<s32>(stream, header, row, f);
+                    val = (val & f.mask) >> f.shift;
+                    val |= val & 0x80000000 == 0x80000000 ? ~0xFFFFFFFF : val;
                     text += string_format(fmt, val);
                     break; 
                 }
                 case BCSV::DataType::CHAR: {
                     char val = BCSV::ReadType<char>(stream, header, row, f);
+                    val = (val & f.mask) >> f.shift;
+                    val |= val & 0x80 == 0x80 ? ~0xFF : val;
                     text += string_format(fmt, val);
                     break;
                 }
                 case BCSV::DataType::SHORT: {
                     s16 val = BCSV::ReadType<s16>(stream, header, row, f);
+                    val = (val & f.mask) >> f.shift;
+                    val |= val & 0x8000 == 0x8000 ? ~0xFFFF : val;
                     text += string_format(fmt, val);
                     break;
                 }
