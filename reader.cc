@@ -41,8 +41,8 @@ void Reader::WriteCSV(const char* path) {
                     break; 
                 }
                 case BCSV::DataType::CHAR: {
-                    char val = BCSV::ReadType<char>(stream, header, row, f);
-                    val = (val & f.mask) >> f.shift;
+                    int val = BCSV::ReadType<char>(stream, header, row, f) & f.mask;
+                    val >>= f.shift;
                     val |= val & 0x80 == 0x80 ? ~0xFF : val;
                     text += string_format(fmt, val);
                     break;
