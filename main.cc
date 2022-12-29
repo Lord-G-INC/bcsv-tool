@@ -1,7 +1,8 @@
 #include "unpack.cc"
 #include "reader.cc"
+#include "writer.cc"
 
 int main() {
-    Reader reader{"ActionSound.bcsv", "lookup_supermariogalaxy.txt"};
-    reader.WriteCSV("test.csv");
+    Writer writer{"test.csv"};
+    writer.GenerateFields();
 }

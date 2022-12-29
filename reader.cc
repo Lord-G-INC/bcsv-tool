@@ -3,31 +3,31 @@
 Reader::Reader(const char* bcsv, const char* hash) {
     stream = OpenReader(bcsv);
     header = BCSV::ReadHeader(stream);
-    Fields = BCSV::ReadFields(stream, header);
-    Hashes = ReadHashes(hash);
+    fields = BCSV::ReadFields(stream, header);
+    hashes = ReadHashes(hash);
 }
 
 void Reader::WriteCSV(const char* path) {
     auto writer = OpenWriter(path);
     std::string text{};
     std::vector<std::string> names{};
-    for (auto& f : Fields) {
+    for (auto& f : fields) {
         u32& h = f.hash;
-        if (Hashes.count(h) == 1) {
-            names.push_back(Hashes[h]);
+        if (hashes.count(h) == 1) {
+            names.push_back(hashes[h]);
         } else {
             names.push_back(string_format("0x%x", h));
         }
     }
     for (auto i = 0; i < names.size(); i++) {
         bool last = i == names.size() - 1;
-        text += names[i] + ':' + string_format("%d", Fields[i].type);
+        text += names[i] + ':' + string_format("%d", fields[i].type);
         text += !last ? ',' : '\n';
     }
     for (auto row = 0; row < header.entrycount; row++) {
-        for (auto i = 0; i < Fields.size(); i++) {
-            bool last = i == Fields.size() - 1;
-            BCSV::Field& f = Fields[i];
+        for (auto i = 0; i < fields.size(); i++) {
+            bool last = i == fields.size() - 1;
+            BCSV::Field& f = fields[i];
             std::string fmt{};
             fmt += BCSV::GetDTFmt(f);
             fmt += !last ? ',' : '\n';
@@ -70,3 +70,4 @@ void Reader::WriteCSV(const char* path) {
     }
     writer->write(text.c_str(), text.size());
 }
+
