@@ -41,17 +41,29 @@ struct StreamDel {};
 template <>
 struct StreamDel<std::ifstream> {
     void operator()(std::ifstream* s) {
-        if (s->is_open()) {
+        if (s->is_open())
             s->close();
-        }
+        delete s;
+    }
+};
+
+template <>
+struct StreamDel<std::ofstream> {
+    void operator()(std::ofstream* s) {
+        if (s->is_open())
+            s->close();
         delete s;
     }
 };
 
 using unique_ifstream = std::unique_ptr<std::ifstream, StreamDel<std::ifstream>>;
+using unique_ofstream = std::unique_ptr<std::ofstream, StreamDel<std::ofstream>>;
 
-unique_ifstream OpenFile(const char* path) {
+unique_ifstream OpenReader(const char* path) {
     return unique_ifstream{new std::ifstream{path, std::ios::binary}};
+}
+unique_ofstream OpenWriter(const char* path) {
+    return unique_ofstream{new std::ofstream{path, std::ios::binary}};
 }
 
 template <bool Swap, typename... Args>

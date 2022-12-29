@@ -16,7 +16,7 @@ static inline const u32 CalcHash(const char* val) {
 
 std::map<u32, std::string> ReadHashes(const char* path) {
     std::map<u32, std::string> result{};
-    unique_ifstream stream = OpenFile(path);
+    unique_ifstream stream = OpenReader(path);
     std::string s{};
     while (std::getline(*stream, s, '\n')) {
         u32 hash = CalcHash(s.c_str());

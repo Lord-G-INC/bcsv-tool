@@ -66,6 +66,7 @@ namespace BCSV {
             case DataType::CHAR: { return "%c"; }
             case DataType::STRING:
             case DataType::STRING_OFF: { return "%s"; }
+            default: { return nullptr; }
         }
     }
     template <bool Swap = true>
@@ -80,7 +81,7 @@ namespace BCSV {
             SwapVal(size);
         data->seekg(stringoff + std::streampos{size}, std::ios::beg);
         std::string result{};
-        std::getline(*data, result);
+        std::getline(*data, result, '\000');
         data->seekg(old);
         return result;
     }
@@ -91,19 +92,8 @@ namespace BCSV {
         data->seekg(posoff, std::ios::beg);
         T result{};
         data->read((char*)&result, sizeof(T));
-        if (Swap)
+        if (Swap && sizeof(T) > 1)
             SwapVal(result);
-        return result;
-    }
-    std::vector<std::string> GetFeildNames(std::vector<Field>& fields, std::map<u32, std::string>& dict) {
-        std::vector<std::string> result{};
-        for (auto& f : fields) {
-            if (dict.count(f.hash) != 0) {
-                result.push_back(dict[f.hash]);
-            } else {
-                result.push_back(string_format("0%x", f.hash));
-            }
-        }
         return result;
     }
 }
