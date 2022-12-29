@@ -14,7 +14,7 @@ Writer::Writer(const char* csv) : Writer() {
 
 void Writer::GenerateFields() {
     std::string s = text.substr(0, text.find('\n'));
-    text = text.substr(0, text.find('\n'));
+    text = text.substr(text.find('\n')+1);
     std::vector<std::string> names{};
     size_t pos = 0;
     std::string token;
@@ -37,11 +37,14 @@ void Writer::GenerateFields() {
             field.hash = CalcHash(n.c_str());
         }
         u8 t = std::stoul(type);
-        if (t == 5) {
-            field.mask = 0xFF;
-        }
         field.type = t;
         fields.push_back(field);
+    }
+    s16 doff = 0;
+    for (int i = 0; i < fields.size(); i++) {
+        auto& f = fields[i];
+        f.dataoff = doff;
+        doff += BCSV::GetDTSize(f);
     }
     return;
 }
