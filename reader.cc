@@ -21,7 +21,7 @@ void Reader::WriteCSV(const char* path) {
     }
     for (auto i = 0; i < names.size(); i++) {
         bool last = i == names.size() - 1;
-        text += names[i];
+        text += names[i] + ':' + string_format("%d", Fields[i].type);
         text += !last ? ',' : '\n';
     }
     for (auto row = 0; row < header.entrycount; row++) {
