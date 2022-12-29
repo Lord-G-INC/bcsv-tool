@@ -63,7 +63,7 @@ namespace BCSV {
             case DataType::SHORT:
             case DataType::LONG_2: { return "%d"; }
             case DataType::FLOAT: { return "%f"; }
-            case DataType::CHAR: { return "%c"; }
+            case DataType::CHAR: { return "%d"; }
             case DataType::STRING:
             case DataType::STRING_OFF: { return "%s"; }
             default: { return nullptr; }
