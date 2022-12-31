@@ -1,2 +1,2 @@
 # bcsv-tool
-A tool to dump bcsv files
+A tool to dump bcsv files to csv and visa versa
