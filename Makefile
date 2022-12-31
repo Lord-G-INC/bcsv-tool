@@ -7,4 +7,4 @@ endif
 all: $(TARGET)
 
 $(TARGET): main.cc
-	g++ -s -Os $^ -o $@ -static-libstdc++
+	g++ -s -Os $^ -o $@ -static-libstdc++ -static-libgcc -static
