@@ -30,7 +30,7 @@ namespace BCSV {
     }
     struct Field {
         u32 hash;
-        u32 mask = 255;
+        u32 mask = 0xFFFFFFFF;
         u16 dataoff;
         u8 shift;
         u8 type;
