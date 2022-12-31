@@ -107,70 +107,66 @@ namespace {
         return buf.res;
     }
     template <typename T, bool Swap = true>
-    void write(T val, unique_ofstream& stream) {
-        auto arr = GetBytes<T, Swap>(val);
-        stream->write((char*)arr.data(), sizeof(T));
+    void write(T val, std::vector<u8>& vec, size_t& off) {
+        std::array<u8, sizeof(T)> buffer = GetBytes<T, Swap>(val);
+        std::copy(buffer.begin(), buffer.end(), vec.begin() + off);
+        off += sizeof(T);
     }
 }
 
-void Writer::WriteBCSV(const char* path, std::vector<std::vector<std::string>>& vals, std::string table) {
-    unique_ofstream stream = OpenWriter(path);
-    auto uintw = write<u32>;
-    auto ushtw = write<u16>;
-    auto bytew = write<u8>;
-    auto shtw = write<s16>;
-    auto intw = write<s32>;
-    auto fltw = write<f32>;
-    auto chrw = write<s8>;
-    uintw(header.entrycount, stream);
-    uintw(header.fieldcount, stream);
-    uintw(header.entrydataoff, stream);
-    uintw(header.entrysize, stream);
+size_t Writer::FillHeaderAndFields(std::vector<u8>& vec) {
+    size_t off = 0;
+    write(header.entrycount, vec, off);
+    write(header.fieldcount, vec, off);
+    write(header.entrydataoff, vec, off);
+    write(header.entrysize, vec, off);
     for (int i = 0; i < fields.size(); i++) {
         auto& f = fields[i];
-        uintw(f.hash, stream);
-        uintw(f.mask, stream);
-        ushtw(f.dataoff, stream);
-        bytew(f.shift, stream);
-        bytew(f.type, stream);
+        write(f.hash, vec, off);
+        write(f.mask, vec, off);
+        write(f.dataoff, vec, off);
+        write(f.shift, vec, off);
+        write(f.type, vec, off);
     }
-    std::sort(fields.begin(), fields.end(),
-    [](BCSV::Field& a, BCSV::Field& b){return a.dataoff < b.dataoff;});
-    for (int row = 0; row < vals.size(); row++) {
+    return off;
+}
+
+void Writer::FillFieldTable(std::vector<u8>& vec, size_t dataoff, std::vector<std::vector<std::string>>& vals) {
+    for (int row = 0; row < header.entrycount; row++) {
         for (int i = 0; i < fields.size(); i++) {
             auto& f = fields[i];
             auto& str = vals[row][i];
+            size_t off = dataoff + row * header.entrysize + f.dataoff;
             switch (f.type) {
-                default: {break;}
-                case BCSV::DataType::CHAR: {
-                    char num = std::stoul(str);
-                    chrw(num, stream);
-                    break;
-                }
-                case BCSV::DataType::SHORT: {
-                    s16 num = std::stoul(str);
-                    shtw(num, stream);
-                    break;
-                }
+                default:{break;}
                 case BCSV::DataType::LONG:
                 case BCSV::DataType::LONG_2:
                 case BCSV::DataType::STRING_OFF: {
-                    s32 num = std::stoul(str);
-                    intw(num, stream);
+                    u32 num = std::stoul(str);
+                    write(num, vec, off);
+                    break;
+                }
+                case BCSV::DataType::SHORT: {
+                    u16 num = std::stoul(str);
+                    write(num, vec, off);
                     break;
                 }
                 case BCSV::DataType::FLOAT: {
                     f32 num = std::stof(str);
-                    fltw(num, stream);
+                    write(num, vec, off);
+                    break;
+                }
+                case BCSV::DataType::CHAR: {
+                    s8 num = std::stol(str);
+                    write(num, vec, off);
                     break;
                 }
             }
         }
     }
-    stream->write(table.c_str(), table.size());
-    size_t size = stream->tellp();
-    size = ((size + 31 & ~31) - size);
-    std::unique_ptr<char[]> buffer(new char[size]);
-    memset(buffer.get(), 0x40, size);
-    stream->write(buffer.get(), size);
+}
+
+void Writer::WriteBCSV(const char* path, std::vector<u8>& vec) {
+    auto stream = OpenWriter(path);
+    stream->write((char*)vec.data(), vec.size());
 }
