@@ -5,4 +5,4 @@ else
 endif
 
 $(TARGET): main.cc
-	clang++ -s -Os $^ -o $@ -static -std=c++17
+	clang++ -Os $^ -o $@ -static -std=c++17
