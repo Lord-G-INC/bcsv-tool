@@ -10,6 +10,9 @@ Writer::Writer(const char* csv) : Writer() {
     memset(data.get(), 0, size);
     stream->read(data.get(), size);
     text = std::string{data.get(), size};
+    for (auto pos = text.find('\r'); pos != text.npos; pos = text.find('\r', pos)) {
+        text.erase(pos, 1);
+    }
 }
 
 void Writer::GenerateFields() {
@@ -29,7 +32,7 @@ void Writer::GenerateFields() {
         BCSV::Field field{};
         std::string type = name.substr(name.find(':')+1);
         std::string n = name.substr(0, name.find(':'));
-        if (n.find('x') == 1) {
+        if (n.find('x') == 1 && n.find('0') == 0) {
             u32 num = std::stoul(n, nullptr, 16);
             field.hash = num;
         } else {
@@ -66,6 +69,16 @@ std::vector<std::vector<std::string>> Writer::GetValues() {
         vec.push_back(line);
         result.push_back(vec);
         text = text.substr(pos+1);
+    }
+    if (!text.empty()) {
+        std::vector<std::string> vec;
+        auto line = text;
+        for (size_t lpos = line.find(','); lpos != line.npos; lpos = line.find(',')) {
+            vec.push_back(line.substr(0, lpos));
+            line.erase(0, lpos+1);
+        }
+        vec.push_back(line);
+        result.push_back(vec);
     }
     header.entrycount = result.size();
     return result;

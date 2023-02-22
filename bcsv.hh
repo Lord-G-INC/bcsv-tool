@@ -94,6 +94,7 @@ namespace BCSV {
         data->read((char*)&result, sizeof(T));
         if (Swap && sizeof(T) > 1)
             SwapVal(result);
+        data->seekg(old, std::ios::beg);
         return result;
     }
 }

@@ -36,21 +36,21 @@ void Reader::WriteCSV(const char* path) {
                 case BCSV::DataType::LONG_2: { 
                     u32 val = BCSV::ReadType<u32>(stream, header, row, f);
                     val = (val & f.mask) >> f.shift;
-                    val |= val & 0x80000000 == 0x80000000 ? ~0xFFFFFFFF : val;
+                    val |= (val & 0x80000000) == 0x80000000 ? ~0xFFFFFFFF : val;
                     text += string_format(fmt, val);
                     break; 
                 }
                 case BCSV::DataType::CHAR: {
                     int val = BCSV::ReadType<char>(stream, header, row, f) & f.mask;
                     val >>= f.shift;
-                    val |= val & 0x80 == 0x80 ? ~0xFF : val;
+                    val |= (val & 0x80) == 0x80 ? ~0xFF : val;
                     text += string_format(fmt, val);
                     break;
                 }
                 case BCSV::DataType::SHORT: {
                     u16 val = BCSV::ReadType<u16>(stream, header, row, f);
                     val = (val & f.mask) >> f.shift;
-                    val |= val & 0x8000 == 0x8000 ? ~0xFFFF : val;
+                    val |= (val & 0x8000) == 0x8000 ? ~0xFFFF : val;
                     text += string_format(fmt, val);
                     break;
                 }

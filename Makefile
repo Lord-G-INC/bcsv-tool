@@ -4,7 +4,5 @@ else
 	TARGET := bcsv-tool
 endif
 
-all: $(TARGET)
-
 $(TARGET): main.cc
-	g++ -s -Os $^ -o $@ -static-libstdc++ -static-libgcc -static
+	clang++ -s -Os $^ -o $@ -static -std=c++17

@@ -8,7 +8,7 @@ struct Writer {
     public:
     BCSV::Header header;
     std::vector<BCSV::Field> fields;
-    Writer() : header(), fields(), text() {}
+    Writer() : text(), header(), fields() {}
     Writer(const char*);
     void GenerateFields();
     std::vector<std::vector<std::string>> GetValues();
