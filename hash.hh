@@ -8,7 +8,7 @@
 static inline const u32 CalcHash(const char* val) {
     u32 output{0};
     while (*val != '\0') {
-        output = *val + output * 0x11;
+        output = *val + output * 0x1F;
         val++;
     }
     return output;
