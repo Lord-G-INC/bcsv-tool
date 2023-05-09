@@ -3,6 +3,8 @@ name: Rust
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 env:
   CARGO_TERM_COLOR: always
@@ -29,3 +31,30 @@ jobs:
       with:
         name: ${{matrix.os}}
         path: target/release/bcsv_tool
+  publish:
+    if: github.event_name == 'push'
+    runs-on: windows-latest
+      
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/download-artifact@v2.1.1
+      with:
+        name: windows-latest
+        path: ${{github.workspace}}/windows
+    - uses: actions/download-artifact@v2.1.1
+      with:
+        name: ubuntu-latest
+        path: ${{github.workspace}}/linux
+    - uses: actions/download-artifact@v2.1.1
+      with:
+        name: macos-latest
+        path: ${{github.workspace}}/macos
+    - run: 7z a bcsv_tool.zip windows linux macos
+    - uses: marvinpinto/action-automatic-releases@latest
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "Auto"
+        prerelease: true
+        title: "Auto Build"
+        files: |
+            *.zip
