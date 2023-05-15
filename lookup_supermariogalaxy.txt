@@ -3,7 +3,6 @@
 # 60CB6B62	SoundIdToInstList.bcsv
 # 528AC841	InitSensor.bcsv
 # 4DB4F9C4	InitSensor.bcsv
-# 045C8ED4	ObjectData/PostFog/GradTypeString.bcsv
 # 43EA1591	HeapSizeExcept.bcsv
 # 4D6DBDAE	ObjectData/WorldMap01/SpaceParts.bcsv
 # 433A5DB7	ObjectData/WorldMap01/SpaceParts.bcsv
@@ -22,7 +21,6 @@
 # DCE271F4	BigSignBoard/ActorInfo/ActionFlagCtrl.bcsv
 # 9AA5EF52	BigSignBoard/ActorInfo/ActionFlagCtrl.bcsv
 # 9AA5EE64	BigSignBoard/ActorInfo/ActionFlagCtrl.bcsv
-# 1439D35C	StageSelectMenu.tbl layers?
 # 6DC3A6D2	StageSelectMenu.tbl
 ### General names
 AccelRateToBckPos
@@ -290,7 +288,9 @@ ItemInfoName
 Joint
 JointName
 JumpRush
+Label
 LandEffect
+LayerName
 LayerNo
 LevelNum
 Life
