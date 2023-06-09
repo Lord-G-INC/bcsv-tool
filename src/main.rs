@@ -15,12 +15,16 @@ mod types;
 #[command(about="Converts bcsv files to and from csv.")]
 struct ProgArgs {
     #[arg(short, long)]
+    /// The file to convert from
     pub infile: String,
     #[arg(short, long)]
+    /// The file to convert to
     pub outfile: String,
     #[arg(short, long)]
+    /// The hash lookup file to use
     pub lookup: String,
     #[arg(short, long)]
+    /// If enabled, will use the OPPOSITE endian to the system's endian.
     pub endian: bool
 }
 
