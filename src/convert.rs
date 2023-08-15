@@ -81,11 +81,14 @@ pub fn convert_to_csv(bcsv: BCSV, hashes: &HashMap<u32, String>) -> String {
     text
 }
 
-pub fn convert_to_bcsv(mut csv: csv::CSV, endian: Endian) -> BinResult<Vec<u8>> {
+pub fn convert_to_bcsv(mut csv: csv::CSV, endian: Endian, mask: u32) -> BinResult<Vec<u8>> {
     let mut bcsv = csv.generate_bcsv();
     let mut buffer = Cursor::new(vec![]);
     let table = csv.create_stringtable();
     csv.create_values(&mut bcsv);
+    for field in &mut bcsv.fields {
+        field.mask = mask;
+    }
     bcsv.write_options(&mut buffer, endian, ())?;
     let stroff = bcsv.header.entrydataoff as usize + bcsv.header.entrysize as usize *
         bcsv.header.entrycount as usize;

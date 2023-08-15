@@ -25,7 +25,10 @@ struct ProgArgs {
     pub lookup: String,
     #[arg(short, long)]
     /// If enabled, will use the OPPOSITE endian to the system's endian.
-    pub endian: bool
+    pub endian: bool,
+    /// The mask to use for values, by default this is u32::MAX.
+    #[arg(short, long, default_value_t = u32::MAX)]
+    pub mask: u32
 }
 
 
@@ -48,7 +51,7 @@ fn main() -> binrw::BinResult<()> {
         std::fs::write(args.outfile, csv)?;
     } else if ext == "csv" {
         let csv = csv::CSV::new(inpath)?;
-        let bcsv = convert::convert_to_bcsv(csv, endian)?;
+        let bcsv = convert::convert_to_bcsv(csv, endian, args.mask)?;
         std::fs::write(args.outfile, bcsv)?;
     }
     Ok(())
