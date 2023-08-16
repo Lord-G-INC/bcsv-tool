@@ -22,7 +22,7 @@ struct ProgArgs {
     pub outfile: String,
     #[arg(short, long)]
     /// The hash lookup file to use
-    pub lookup: String,
+    pub lookup: Option<String>,
     #[arg(short, long)]
     /// If enabled, will use the OPPOSITE endian to the system's endian.
     pub endian: bool,
@@ -45,7 +45,7 @@ fn main() -> binrw::BinResult<()> {
     let ext = inpath.extension().unwrap_or_default().to_string_lossy().to_string();
     if ext == "bcsv" || ext == "tbl" || ext == "banmt" || ext == "" || ext == "pa" {
         let mut buffer = Cursor::new(std::fs::read(inpath)?);
-        let hashes = hash::read_hashes(&args.lookup)?;
+        let hashes = hash::read_hashes(&args.lookup.unwrap())?;
         let bcsv = types::BCSV::read_options(&mut buffer, endian, ())?;
         let csv = convert::convert_to_csv(bcsv, &hashes);
         std::fs::write(args.outfile, csv)?;

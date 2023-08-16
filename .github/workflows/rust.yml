@@ -50,7 +50,7 @@ jobs:
       with:
         name: macos-latest
         path: ${{github.workspace}}/macos
-    - run: 7z a bcsv_tool.zip windows linux macos
+    - run: 7z a bcsv_tool.zip windows linux macos lookup_supermariogalaxy.txt
     - uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
