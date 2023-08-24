@@ -15,11 +15,14 @@ struct ProgArgs {
     /// The file to convert to.
     pub outfile: String,
     #[arg(short, long)]
-    /// The hash lookup file to use, this SHOULD be provided when doing bcsv -> csv,
+    /// The hash lookup file to use, 
+    /// 
+    /// this SHOULD be provided when doing bcsv -> csv,
     /// but isn't required.
     pub lookup: Option<String>,
     #[arg(short, long)]
     /// If enabled, use the OPPOSITE endian to the system's endian.
+    /// 
     /// Little Endian becomes Big Endian, and vice versa.
     pub endian: bool,
     /// The mask to use for values, by default this is u32::MAX.
