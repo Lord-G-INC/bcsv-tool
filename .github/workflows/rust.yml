@@ -19,6 +19,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: recursive
     - name: Build
       run: cargo build --release --verbose
     - uses: actions/upload-artifact@v3.1.2

@@ -1,0 +1,3 @@
+[submodule "libbcsv"]
+	path = libbcsv
+	url = https://github.com/Lord-G-INC/libbcsv
