@@ -47,7 +47,8 @@ fn main() -> Result<(), BcsvError> {
     if ext == "bcsv" || ext == "tbl" || ext == "banmt" || ext == "" || ext == "pa" {
         let mut buffer = Cursor::new(std::fs::read(inpath)?);
         let hashes = args.lookup
-        .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
+        .map(|x| hash::read_hashes(x).ok())
+        .unwrap_or(None).unwrap_or_default();
         let bcsv = types::BCSV::read_options(&mut buffer, endian, ())?;
         if oext == "csv" {
             let csv = bcsv.convert_to_csv(hashes);
