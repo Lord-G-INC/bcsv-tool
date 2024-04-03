@@ -39,7 +39,7 @@ fn main() -> Result<(), BcsvError> {
         }
     };
     if let Some(inext) = inpath.extension() {
-        if inext.to_string_lossy().ends_with("csv") {
+        if inext.to_string_lossy() == "csv" {
             // csv to bcsv, extension for output not checked because bcsv has a few oddball extensions
             let csv = csv_parse::CSV::from_path(inpath)?;
             let data = csv.create_bcsv().to_bytes(endian)?;
@@ -49,7 +49,7 @@ fn main() -> Result<(), BcsvError> {
             if oext == inext {
                 return Err("Extensions cannot match.".into());
             }
-            if oext.to_string_lossy().ends_with("csv") {
+            if oext.to_string_lossy() == "csv" {
                 // bcsv to csv
                 let data = std::fs::read(inpath)?;
                 let mut reader = Cursor::new(data);
@@ -59,7 +59,8 @@ fn main() -> Result<(), BcsvError> {
                 .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
                 let text = bcsv.convert_to_csv(&hashes);
                 std::fs::write(outpath, text)?;
-            } else if oext.to_string_lossy().ends_with("xlsx") {
+                return Ok(());
+            } else if oext.to_string_lossy() == "xlsx" {
                 // bcsv to xlsx
                 let data = std::fs::read(inpath)?;
                 let mut reader = Cursor::new(data);
@@ -68,12 +69,13 @@ fn main() -> Result<(), BcsvError> {
                 let hashes = lookup.as_ref()
                 .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
                 bcsv.convert_to_xlsx(outpath.as_os_str().to_string_lossy(), &hashes)?;
+                return Ok(());
             }
         }
     }
     // There are bcsv files with no extension, so this has to happen..
     if let Some(oext) = outpath.extension() {
-        if oext.to_string_lossy().ends_with("csv") {
+        if oext.to_string_lossy() == "csv" {
             // bcsv to csv
             let data = std::fs::read(inpath)?;
             let mut reader = Cursor::new(data);
@@ -83,7 +85,7 @@ fn main() -> Result<(), BcsvError> {
             .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
             let text = bcsv.convert_to_csv(&hashes);
             std::fs::write(outpath, text)?;
-        } else if oext.to_string_lossy().ends_with("xlsx") {
+        } else if oext.to_string_lossy() == "xlsx" {
             // bcsv to xlsx
             let data = std::fs::read(inpath)?;
             let mut reader = Cursor::new(data);
