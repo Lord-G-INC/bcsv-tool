@@ -24,8 +24,11 @@ struct ProgArgs {
     /// Little Endian becomes Big Endian, and vice versa.
     pub endian: bool,
     #[arg(short, long)]
-    // If enabled, the SHORT and CHAR types will be SIGNED.
-    pub signed: bool
+    /// If enabled, the SHORT and CHAR datatypes will be SIGNED.
+    pub signed: bool,
+    #[arg(short, long)]
+    /// Optional delimiter for CSV reading/writing
+    pub delim: Option<char>
 }
 
 
@@ -35,6 +38,10 @@ fn main() -> Result<(), BcsvError> {
     let outpath = Path::new(&args.outfile);
     let lookup = &args.lookup;
     let signed = args.signed;
+    let delim = match args.delim {
+        Some(d) => d,
+        None => ','
+    };
     let endian = match args.endian {
         false => Endian::NATIVE,
         true => match Endian::NATIVE {
@@ -45,7 +52,7 @@ fn main() -> Result<(), BcsvError> {
     if let Some(inext) = inpath.extension() {
         if inext.to_string_lossy() == "csv" {
             // csv to bcsv, extension for output not checked because bcsv has a few oddball extensions
-            let csv = csv_parse::CSV::from_path(inpath)?;
+            let csv = csv_parse::CSV::from_path(inpath, delim)?;
             let data = csv.create_bcsv().to_bytes(endian)?;
             std::fs::write(outpath, data)?;
         }
@@ -61,7 +68,7 @@ fn main() -> Result<(), BcsvError> {
                 bcsv.read(&mut reader, endian)?;
                 let hashes = lookup.as_ref()
                 .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
-                let text = bcsv.convert_to_csv(&hashes, signed);
+                let text = bcsv.convert_to_csv(&hashes, signed, delim);
                 std::fs::write(outpath, text)?;
                 return Ok(());
             } else if oext.to_string_lossy() == "xlsx" {
@@ -87,7 +94,7 @@ fn main() -> Result<(), BcsvError> {
             bcsv.read(&mut reader, endian)?;
             let hashes = lookup.as_ref()
             .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
-            let text = bcsv.convert_to_csv(&hashes, signed);
+            let text = bcsv.convert_to_csv(&hashes, signed, delim);
             std::fs::write(outpath, text)?;
         } else if oext.to_string_lossy() == "xlsx" {
             // bcsv to xlsx
