@@ -22,7 +22,10 @@ struct ProgArgs {
     /// If enabled, use the OPPOSITE endian to the system's endian.
     /// 
     /// Little Endian becomes Big Endian, and vice versa.
-    pub endian: bool
+    pub endian: bool,
+    #[arg(short, long)]
+    // If enabled, the SHORT and CHAR types will be SIGNED.
+    pub signed: bool
 }
 
 
@@ -31,6 +34,7 @@ fn main() -> Result<(), BcsvError> {
     let inpath = Path::new(&args.infile);
     let outpath = Path::new(&args.outfile);
     let lookup = &args.lookup;
+    let signed = args.signed;
     let endian = match args.endian {
         false => Endian::NATIVE,
         true => match Endian::NATIVE {
@@ -57,7 +61,7 @@ fn main() -> Result<(), BcsvError> {
                 bcsv.read(&mut reader, endian)?;
                 let hashes = lookup.as_ref()
                 .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
-                let text = bcsv.convert_to_csv(&hashes);
+                let text = bcsv.convert_to_csv(&hashes, signed);
                 std::fs::write(outpath, text)?;
                 return Ok(());
             } else if oext.to_string_lossy() == "xlsx" {
@@ -68,7 +72,7 @@ fn main() -> Result<(), BcsvError> {
                 bcsv.read(&mut reader, endian)?;
                 let hashes = lookup.as_ref()
                 .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
-                bcsv.convert_to_xlsx(outpath.as_os_str().to_string_lossy(), &hashes)?;
+                bcsv.convert_to_xlsx(outpath.as_os_str().to_string_lossy(), &hashes, signed)?;
                 return Ok(());
             }
         }
@@ -83,7 +87,7 @@ fn main() -> Result<(), BcsvError> {
             bcsv.read(&mut reader, endian)?;
             let hashes = lookup.as_ref()
             .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
-            let text = bcsv.convert_to_csv(&hashes);
+            let text = bcsv.convert_to_csv(&hashes, signed);
             std::fs::write(outpath, text)?;
         } else if oext.to_string_lossy() == "xlsx" {
             // bcsv to xlsx
@@ -93,7 +97,7 @@ fn main() -> Result<(), BcsvError> {
             bcsv.read(&mut reader, endian)?;
             let hashes = lookup.as_ref()
             .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
-            bcsv.convert_to_xlsx(outpath.as_os_str().to_string_lossy(), &hashes)?;
+            bcsv.convert_to_xlsx(outpath.as_os_str().to_string_lossy(), &hashes, signed)?;
         }
     }
     Ok(())
