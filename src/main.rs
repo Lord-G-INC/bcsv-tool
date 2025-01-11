@@ -24,8 +24,8 @@ struct ProgArgs {
     /// Little Endian becomes Big Endian, and vice versa.
     pub endian: bool,
     #[arg(short, long)]
-    /// If enabled, the SHORT and CHAR datatypes will be SIGNED.
-    pub signed: bool,
+    /// If enabled, the SHORT and CHAR datatypes will be UNSIGNED.
+    pub unsigned: bool,
     #[arg(short, long)]
     /// Optional delimiter for CSV reading/writing
     pub delim: Option<char>
@@ -37,7 +37,7 @@ fn main() -> Result<(), BcsvError> {
     let inpath = Path::new(&args.infile);
     let outpath = Path::new(&args.outfile);
     let lookup = &args.lookup;
-    let signed = args.signed;
+    let signed = !args.unsigned;
     let delim = match args.delim {
         Some(d) => d,
         None => ','
