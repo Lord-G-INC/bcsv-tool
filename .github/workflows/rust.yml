@@ -23,12 +23,12 @@ jobs:
         submodules: recursive
     - name: Build
       run: cargo build --release --verbose
-    - uses: actions/upload-artifact@v3.1.2
+    - uses: actions/upload-artifact@v4.6.0
       if: runner.os == 'Windows'
       with:
         name: ${{matrix.os}}
         path: target/release/bcsv_tool.exe
-    - uses: actions/upload-artifact@v3.1.2
+    - uses: actions/upload-artifact@v4.6.0
       if: runner.os != 'Windows'
       with:
         name: ${{matrix.os}}
@@ -40,15 +40,15 @@ jobs:
       
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/download-artifact@v2.1.1
+    - uses: actions/download-artifact@v4.1.8
       with:
         name: windows-latest
         path: ${{github.workspace}}/windows
-    - uses: actions/download-artifact@v2.1.1
+    - uses: actions/download-artifact@v4.1.8
       with:
         name: ubuntu-latest
         path: ${{github.workspace}}/linux
-    - uses: actions/download-artifact@v2.1.1
+    - uses: actions/download-artifact@v4.1.8
       with:
         name: macos-latest
         path: ${{github.workspace}}/macos
