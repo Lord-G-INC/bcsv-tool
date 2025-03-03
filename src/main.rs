@@ -72,8 +72,8 @@ fn main() -> Result<(), BcsvError> {
     if let Some(inext) = inpath.extension() {
         if inext.to_string_lossy() == "csv" {
             // csv to bcsv, extension for output not checked because bcsv has a few oddball extensions
-            let csv = csv_parse::CSV::from_path(inpath, delim)?;
-            let data = csv.create_bcsv().to_bytes(endian.into())?;
+            let bcsv = csv_parse::CSV::from_path(inpath, delim)?;
+            let data = bcsv.to_bytes(endian.into())?;
             std::fs::write(outpath, data)?;
         }
         if let Some(oext) = outpath.extension() {
@@ -88,7 +88,8 @@ fn main() -> Result<(), BcsvError> {
                 bcsv.read(&mut reader, endian.into())?;
                 let hashes = lookup.as_ref()
                 .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
-                let text = bcsv.convert_to_csv(&hashes, signed, delim);
+                bcsv.hash_table = hashes;
+                let text = bcsv.convert_to_csv(signed, delim);
                 std::fs::write(outpath, text)?;
                 return Ok(());
             } else if oext.to_string_lossy() == "xlsx" {
@@ -99,7 +100,8 @@ fn main() -> Result<(), BcsvError> {
                 bcsv.read(&mut reader, endian.into())?;
                 let hashes = lookup.as_ref()
                 .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
-                bcsv.convert_to_xlsx(outpath.as_os_str().to_string_lossy(), &hashes, signed)?;
+                bcsv.hash_table = hashes;
+                bcsv.convert_to_xlsx(outpath.as_os_str().to_string_lossy(), signed)?;
                 return Ok(());
             }
         }
@@ -114,7 +116,8 @@ fn main() -> Result<(), BcsvError> {
             bcsv.read(&mut reader, endian.into())?;
             let hashes = lookup.as_ref()
             .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
-            let text = bcsv.convert_to_csv(&hashes, signed, delim);
+            bcsv.hash_table = hashes;
+            let text = bcsv.convert_to_csv(signed, delim);
             std::fs::write(outpath, text)?;
         } else if oext.to_string_lossy() == "xlsx" {
             // bcsv to xlsx
@@ -124,7 +127,8 @@ fn main() -> Result<(), BcsvError> {
             bcsv.read(&mut reader, endian.into())?;
             let hashes = lookup.as_ref()
             .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
-            bcsv.convert_to_xlsx(outpath.as_os_str().to_string_lossy(), &hashes, signed)?;
+            bcsv.hash_table = hashes;
+            bcsv.convert_to_xlsx(outpath.as_os_str().to_string_lossy(), signed)?;
         }
     }
     Ok(())

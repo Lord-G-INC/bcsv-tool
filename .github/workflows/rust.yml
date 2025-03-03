@@ -33,8 +33,30 @@ jobs:
       with:
         name: ${{matrix.os}}
         path: target/release/bcsv_tool
+  build-serde:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recusive
+    - name: Build
+      run: cargo build --release --features serde --verbose
+    - uses: actions/upload-artifact@v4.6.0
+      if: runner.os == 'Windows'
+      with:
+        name: ${{ matrix.os }}-serde
+        path: target/release/bcsv_tool.exe
+    - uses: actions/upload-artifact@v4.6.0
+      if: runner.os != 'Windows'
+      with:
+        name: ${{ matrix.os }}-serde
+        path: target/release/bcsv_tool
   publish:
-    needs: build
+    needs: [build, build-serde]
     if: github.event_name == 'push'
     runs-on: windows-latest
       
@@ -52,7 +74,19 @@ jobs:
       with:
         name: macos-latest
         path: ${{github.workspace}}/macos
-    - run: 7z a bcsv_tool.zip windows linux macos lookup_supermariogalaxy.txt
+    - uses: actions/download-artifact@v4.1.8
+      with:
+        name: windows-latest-serde
+        path: ${{github.workspace}}/windows-serde
+    - uses: actions/download-artifact@v4.1.8
+      with:
+        name: ubuntu-latest-serde
+        path: ${{github.workspace}}/ubuntu-serde
+    - uses: actions/download-artifact@v4.1.8
+      with:
+        name: macos-latest-serde
+        path: ${{github.workspace}}/macos-serde
+    - run: 7z a bcsv_tool.zip windows linux macos windows-serde linux-serde macos-serde lookup_supermariogalaxy.txt
     - uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
