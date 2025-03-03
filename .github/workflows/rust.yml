@@ -81,7 +81,7 @@ jobs:
     - uses: actions/download-artifact@v4.1.8
       with:
         name: ubuntu-latest-serde
-        path: ${{github.workspace}}/ubuntu-serde
+        path: ${{github.workspace}}/linux-serde
     - uses: actions/download-artifact@v4.1.8
       with:
         name: macos-latest-serde
