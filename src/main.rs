@@ -89,7 +89,7 @@ fn main() -> Result<(), BcsvError> {
                 let hashes = lookup.as_ref()
                 .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
                 bcsv.hash_table = hashes;
-                let text = bcsv.convert_to_csv(signed, delim);
+                let text = bcsv.convert_to_csv(signed, delim)?;
                 std::fs::write(outpath, text)?;
                 return Ok(());
             } else if oext.to_string_lossy() == "xlsx" {
@@ -117,7 +117,7 @@ fn main() -> Result<(), BcsvError> {
             let hashes = lookup.as_ref()
             .map(|x| hash::read_hashes(x).unwrap_or_default()).unwrap_or_default();
             bcsv.hash_table = hashes;
-            let text = bcsv.convert_to_csv(signed, delim);
+            let text = bcsv.convert_to_csv(signed, delim)?;
             std::fs::write(outpath, text)?;
         } else if oext.to_string_lossy() == "xlsx" {
             // bcsv to xlsx
